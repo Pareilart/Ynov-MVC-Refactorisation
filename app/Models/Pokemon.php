@@ -2,25 +2,26 @@
 
 namespace App\Models;
 
+use App\Enums\EnumPokemonType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Pokemon extends Model
 {
     use HasFactory;
 
     protected $table = 'pokemons';
-    protected $fillable = ['name', 'type'];
-
-    /**
-     * Récupère tous les Pokémons triés par nom.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getAllSortedByName()
-    {
-        return self::orderBy('name')->get();
-    }
+    protected $fillable = [
+        'number',
+        'name',
+        'image',
+        'description',
+        'hp',
+        'attack',
+        'defense',
+        'speed',
+    ];
 
     /**
      * Récupère les Pokémons par type.
@@ -34,13 +35,25 @@ class Pokemon extends Model
     }
 
     /**
-     * Vérifie si le Pokémon est de type Plante.
+     * Récupère les types associés au Pokémon.
      *
-     * @return bool
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function isPlantType()
+    public function types(): BelongsToMany
     {
-        return stripos($this->type, 'Plante') !== false;
+        return $this->belongsToMany(Type::class, 'pokemon_type', 'pokemon_id', 'type_id');
+    }
+
+    /**
+     * Récupère la couleur de fond basée sur le premier type du Pokémon.
+     *
+     * @return string
+     */
+    public function getBackgroundColor(): string
+    {
+        return $this->types->isNotEmpty()
+            ? EnumPokemonType::from($this->types->first()->name)->getBackgroundColor()
+            : 'bg-gray-400';
     }
 }
 
