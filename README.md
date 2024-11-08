@@ -39,7 +39,7 @@ DB_CONNECTION=sqlite
 5. Initialiser la base de données
 ```bash
 php artisan migrate:fresh
-php artisan db:seed --class=PokemonSeeder
+php artisan db:seed
 ```
 
 ## Lancement du projet
